@@ -1,0 +1,34 @@
+module D_FF(
+	input logic D,preset_n,clear_n,clk,
+	output logic Q);
+always_ff @(posedge clk)
+	begin 
+		Q<=D;
+	end
+endmodule
+module hpmr(
+    input  logic        clk,
+    input  logic        en,        
+    input  logic [8:0]  D_in,      
+    output logic [8:0]  Q_out      
+);
+
+    logic [8:0] D_mux; // ngõ vào sau khi xét enable
+
+    // Khi en = 1: D_mux = D_in
+    // Khi en = 0: D_mux = Q_out (giữ nguyên)
+    assign D_mux = en ? D_in : Q_out;
+
+    // 9 D-FF ghép song song
+    genvar i;
+    generate 
+        for(i=0; i<9; i++) begin : reg9
+            D_FF dff_inst(
+                .D  (D_mux[i]),
+                .clk(clk),
+                .Q  (Q_out[i])
+            );
+        end
+    endgenerate
+
+endmodule
